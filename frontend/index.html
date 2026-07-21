@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Threat Disruption System | SOC Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<div class="app-container">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div class="logo-block">
+      <div class="logo-icon">⬡</div>
+      <div>
+        <div class="logo-title">ATDS</div>
+        <div class="logo-sub">AI Threat Disruption</div>
+      </div>
+    </div>
+
+    <div class="system-status">
+      <span class="status-dot pulse"></span>
+      <span id="sidebarRisk">SYSTEM ONLINE</span>
+    </div>
+
+    <nav>
+      <div class="nav-label">MONITOR</div>
+      <ul class="menu">
+        <li class="menu-item active" onclick="showSection('dashboard')">
+          <span class="nav-icon">◈</span> Dashboard
+        </li>
+        <li class="menu-item" onclick="showSection('incidents')">
+          <span class="nav-icon">◉</span> Incidents
+        </li>
+        <li class="menu-item" onclick="showSection('live')">
+          <span class="nav-icon">◎</span> Live Traffic
+        </li>
+      </ul>
+
+      <div class="nav-label">INTELLIGENCE</div>
+      <ul class="menu">
+        <li class="menu-item" onclick="showSection('personas')">
+          <span class="nav-icon">◈</span> Attacker Personas
+        </li>
+        <li class="menu-item" onclick="showSection('killchain')">
+          <span class="nav-icon">◉</span> Kill Chain
+        </li>
+        <li class="menu-item" onclick="showSection('evaluation')">
+          <span class="nav-icon">◎</span> Model Evaluation
+        </li>
+      </ul>
+
+      <div class="nav-label">ADVANCED</div>
+      <ul class="menu">
+        <li class="menu-item" onclick="showSection('evasion')">
+          <span class="nav-icon">◈</span> Evasion Detection
+        </li>
+        <li class="menu-item" onclick="showSection('honeypot')">
+          <span class="nav-icon">◉</span> Honeypot
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="footer-stat">
+        <span class="footer-label">SUPPRESSION</span>
+        <span id="suppressionRate" class="footer-val">—</span>
+      </div>
+      <div class="footer-stat">
+        <span class="footer-label">STREAM</span>
+        <span id="streamHealth" class="footer-val">—</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <section id="dashboard" class="content-section active">
+      <div class="section-header">
+        <h1>Threat Operations Center</h1>
+        <div id="riskBanner" class="risk-banner normal">● SYSTEM STATUS: NORMAL</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">NETWORK EVENTS</div>
+          <div class="stat-value" id="totalEvents">—</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">INCIDENTS</div>
+          <div class="stat-value" id="totalIncidents">—</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">ACTIVE ANOMALIES</div>
+          <div class="stat-value" id="activeAnomalies">—</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-label">SUPPRESSED ALERTS</div>
+          <div class="stat-value" id="suppressedAlerts">—</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">HONEYPOT HITS</div>
+          <div class="stat-value" id="honeypotHits">—</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">EVASION SUSPECTS</div>
+          <div class="stat-value" id="evasionSuspects">—</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="panel">
+  <div class="panel-header"><span>INCIDENTS OVER TIME</span><span class="panel-tag">24H</span></div>
+  <div style="height: 500px;">
+    <canvas id="incidentChart"></canvas>
+  </div>
+</div>
+        <div class="panel">
+  <div class="panel-header"><span>SEVERITY BREAKDOWN</span><span class="panel-tag">LIVE</span></div>
+  <div style="height:450px;">
+    <canvas id="severityChart"></canvas>
+  </div>
+</div>
+        <div class="panel">
+          <div class="panel-header"><span>ATTACK DISTRIBUTION</span><span class="panel-tag">ML</span></div>
+          <canvas id="attackChart"></canvas>
+        </div>
+        <div class="panel threat-card">
+          <div class="panel-header"><span>TOP REPEAT OFFENDERS</span><span class="panel-tag">RANKED</span></div>
+          <div id="threatLeaderboard"></div>
+        </div>
+      </div>
+
+      <div class="panel fatigue-panel">
+        <div class="panel-header"><span>ALERT STREAM HEALTH</span><span class="panel-tag">AUTO</span></div>
+        <div id="alertFatigueDisplay" class="fatigue-grid"></div>
+      </div>
+    </section>
+
+    <!-- ===== INCIDENTS ===== -->
+    <section id="incidents" class="content-section">
+      <div class="section-header">
+        <h1>Incident Log</h1>
+        <span id="incidentCount" class="badge">0 incidents</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>SOURCE IP</th><th>TYPE</th><th>SEVERITY</th>
+              <th>CONFIDENCE</th><th>KILL CHAIN</th><th>TIME</th><th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody id="incidentTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== LIVE TRAFFIC ===== -->
+    <section id="live" class="content-section">
+      <div class="section-header">
+        <h1>Live Network Traffic</h1>
+        <span class="live-indicator">● LIVE</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>SOURCE IP</th><th>DESTINATION IP</th><th>PROTOCOL</th>
+              <th>PACKET SIZE</th><th>TIME</th>
+            </tr>
+          </thead>
+          <tbody id="liveEventsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== ATTACKER PERSONAS ===== -->
+    <section id="personas" class="content-section">
+      <div class="section-header">
+        <h1>Attacker Persona Intelligence</h1>
+        <span class="badge">DBSCAN Clustering</span>
+      </div>
+      <div id="personaGrid" class="persona-grid">
+        <div class="empty-state">No persona clusters detected yet.<br>Send traffic from multiple IPs to trigger clustering.</div>
+      </div>
+    </section>
+
+    <!-- ===== KILL CHAIN ===== -->
+    <section id="killchain" class="content-section">
+      <div class="section-header">
+        <h1>Kill Chain Tracker</h1>
+        <span class="badge">MITRE ATT&CK</span>
+      </div>
+
+      <div class="kc-lookup">
+        <input type="text" id="kcIpInput" placeholder="Enter source IP to lookup kill chain history..." />
+        <button onclick="lookupKillChain()">ANALYZE</button>
+      </div>
+
+      <div id="kcResult" class="kc-result hidden"></div>
+
+      <div class="panel kc-reference">
+        <div class="panel-header"><span>ATT&CK KILL CHAIN STAGES</span></div>
+        <div class="kc-stages-grid">
+          <div class="kc-stage-ref s1">Reconnaissance</div>
+          <div class="kc-stage-ref s2">Resource Dev</div>
+          <div class="kc-stage-ref s3">Initial Access</div>
+          <div class="kc-stage-ref s4">Execution</div>
+          <div class="kc-stage-ref s5">Persistence</div>
+          <div class="kc-stage-ref s6">Priv Escalation</div>
+          <div class="kc-stage-ref s7">Defense Evasion</div>
+          <div class="kc-stage-ref s8">Credential Access</div>
+          <div class="kc-stage-ref s9">Discovery</div>
+          <div class="kc-stage-ref s10">Lateral Movement</div>
+          <div class="kc-stage-ref s11">Collection</div>
+          <div class="kc-stage-ref s12">C2</div>
+          <div class="kc-stage-ref s13">Exfiltration</div>
+          <div class="kc-stage-ref s14">Impact</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MODEL EVALUATION ===== -->
+    <section id="evaluation" class="content-section">
+      <div class="section-header">
+        <h1>Model Evaluation — CICIDS 2017</h1>
+        <span class="badge">Research Paper · Table 1</span>
+      </div>
+      <div id="evalContent" class="eval-grid">
+        <div class="empty-state">Loading evaluation results...</div>
+      </div>
+    </section>
+
+    <!-- ===== EVASION DETECTION ===== -->
+    <section id="evasion" class="content-section">
+      <div class="section-header">
+        <h1>Adversarial Evasion Detection</h1>
+        <span class="badge">Meta-Detection Layer</span>
+      </div>
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat-card red">
+          <div class="stat-label">CONFIRMED EVADERS</div>
+          <div class="stat-value" id="confirmedEvaders">—</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">SUSPECTED EVADERS</div>
+          <div class="stat-value" id="suspectedEvaders">—</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-label">TOTAL SUSPECTS</div>
+          <div class="stat-value" id="totalSuspects">—</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>EVASION SUSPECTS</span>
+          <span class="panel-tag">AUTO-REFRESH 30s</span>
+        </div>
+        <div id="evasionGrid" class="evasion-grid">
+          <div class="empty-state">No evasion attempts detected yet.<br>
+          Evasion detection activates after 10+ events per IP.<br>
+          Suspects appear when Z-scores cluster suspiciously near threshold.</div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-header"><span>HOW EVASION DETECTION WORKS</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:4px;">
+          <div style="padding:14px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--cyan);">
+            <div style="font-size:10px;letter-spacing:2px;color:var(--cyan);margin-bottom:8px;">METHOD 1</div>
+            <div style="font-size:12px;font-weight:bold;margin-bottom:6px;color:var(--text-bright);">Z-Score Variance Analysis</div>
+            <div style="font-size:11px;color:var(--text-dim);line-height:1.7;">Legitimate traffic shows natural variance. Suspiciously LOW variance in Z-scores = attacker is rate-controlling to stay under threshold.</div>
+          </div>
+          <div style="padding:14px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--yellow);">
+            <div style="font-size:10px;letter-spacing:2px;color:var(--yellow);margin-bottom:8px;">METHOD 2</div>
+            <div style="font-size:12px;font-weight:bold;margin-bottom:6px;color:var(--text-bright);">Threshold Proximity Clustering</div>
+            <div style="font-size:11px;color:var(--text-dim);line-height:1.7;">Flags IPs whose Z-scores cluster in the 1.8–2.45 zone — just below the 2.5 detection threshold. Random traffic doesn't cluster like this.</div>
+          </div>
+          <div style="padding:14px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--orange);">
+            <div style="font-size:10px;letter-spacing:2px;color:var(--orange);margin-bottom:8px;">METHOD 3</div>
+            <div style="font-size:12px;font-weight:bold;margin-bottom:6px;color:var(--text-bright);">Rate Consistency Analysis</div>
+            <div style="font-size:11px;color:var(--text-dim);line-height:1.7;">Real attackers send bursts. Unnaturally constant inter-packet timing (low coefficient of variation) = automated rate-limiting bot.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== HONEYPOT ===== -->
+    <section id="honeypot" class="content-section">
+      <div class="section-header">
+        <h1>Honeypot — Self-Improvement Loop</h1>
+        <span class="badge">Confirmed Attack Capture</span>
+      </div>
+      <div class="stats-grid" style="margin-bottom:20px;">
+        <div class="stat-card red">
+          <div class="stat-label">CONFIRMED HITS</div>
+          <div class="stat-value" id="hpTotalHits">—</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-label">ACTIVE PORTS</div>
+          <div class="stat-value" id="hpActivePorts">—</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">NEXT RETRAIN IN</div>
+          <div class="stat-value" id="hpNextRetrain">—</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">MODEL STATUS</div>
+          <div class="stat-value" id="hpModelStatus">—</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="panel">
+          <div class="panel-header"><span>RECENT CONFIRMED ATTACKS</span><span class="panel-tag">HONEYPOT</span></div>
+          <div id="honeypotHitsList">
+            <div class="empty-state">No honeypot hits yet.<br>Send a packet to ports: 4444, 3306, 6379, 27017, 3389</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span>ACTIVE HONEYPOT PORTS</span><span class="panel-tag">DECOYS</span></div>
+          <div id="honeypotPortsList"></div>
+          <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
+            <button class="analyze-btn" style="border-color:var(--orange);color:var(--orange);" onclick="triggerHoneypotRetrain()">
+              ⟳ FORCE RETRAIN ISOLATION FOREST
+            </button>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:6px;">
+              Uses all confirmed honeypot hits to retrain IF model with updated contamination estimate
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ================= INCIDENT MODAL ================= -->
+<div id="incidentModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="modal-title">INCIDENT ANALYSIS</span>
+      <span class="close-btn" onclick="closeModal()">✕</span>
+    </div>
+    <div id="incidentDetailsContent" class="modal-body"></div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/shap_widget.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/incidents.js"></script>
+<script src="js/live.js"></script>
+<script src="js/navigation.js"></script>
+<script>
+  // ── Wire new sections into your existing showSection() function ──────────
+  // Add this AFTER navigation.js loads so it patches the existing function.
+  const _origShowSection = typeof showSection === 'function' ? showSection : null;
+  function showSection(name) {
+    // Call original navigation logic
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+    const target = document.getElementById(name);
+    if (target) target.classList.add('active');
+    const navItem = [...document.querySelectorAll('.menu-item')]
+      .find(el => el.getAttribute('onclick') && el.getAttribute('onclick').includes(`'${name}'`));
+    if (navItem) navItem.classList.add('active');
+
+    // Load data for new sections
+    if (name === 'evasion')    { loadEvasion();    setInterval(loadEvasion, 30000); }
+    if (name === 'honeypot')   { loadHoneypot();   setInterval(loadHoneypot, 15000); }
+    if (name === 'evaluation') { loadEvaluation(); }
+    if (name === 'personas')   { loadPersonas();   }
+  }
+</script>
+</body>
+</html>
