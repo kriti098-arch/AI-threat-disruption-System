@@ -226,7 +226,7 @@ async def create_event(event: NetworkEventCreate, db: Session = Depends(get_db))
     # ══════════════════════════════════════════════════════════
     # STEP 3: Attack classification  (YOUR ORIGINAL CODE)
     # ══════════════════════════════════════════════════════════
-    attack_type = classifier.classify(features, z_score, escalation)
+    attack_type = classifier.classify(features, z_score, escalation, current_size=event.packet_size)
     if attack_type == "Benign":
         attack_type = "Unknown Suspicious Activity"
 

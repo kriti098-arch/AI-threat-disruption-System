@@ -32,7 +32,7 @@ class IsolationForestDetector:
     def add_sample(self, src_ip: str, packet_size: int, baseline: dict):
         vector = self._extract_feature_vector(packet_size, baseline)
         self.buffers[src_ip].append(vector)
-        if len(self.buffers[src_ip]) >= self.min_samples:
+        if len(self.buffers[src_ip]) >= self.min_samples and src_ip not in self.models:
             self._train(src_ip)
 
     def _train(self, src_ip: str):

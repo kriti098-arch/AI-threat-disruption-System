@@ -40,7 +40,7 @@ _load_ml_model()
 
 class AttackClassifier:
 
-    def classify(self, features: dict, z_score: float, escalation: bool) -> str:
+    def classify(self, features: dict, z_score: float, escalation: bool, current_size: float = None) -> str:
         """
         Classify attack type using ML model if available,
         falling back to rule-based classification.
@@ -52,7 +52,7 @@ class AttackClassifier:
                 return ml_result
 
         # Fall back to rule-based
-        return self._classify_rules(features, z_score, escalation)
+        return self._classify_rules(features, z_score, escalation, current_size)
 
     def classify_with_confidence(self, features: dict, z_score: float, escalation: bool) -> dict:
         """Returns attack type + confidence + method used."""
@@ -160,27 +160,28 @@ class AttackClassifier:
         }
         return float(mapping.get(cicids_name, 0))
 
-def _classify_rules(self, features: dict, z_score: float, escalation: bool) -> str:
-    avg_size = features.get("avg_packet_size", 0)
-    std_size = features.get("std_packet_size", 0)
-    samples  = features.get("total_samples", 0)
+    def _classify_rules(self, features: dict, z_score: float, escalation: bool, current_size: float = None) -> str:
+        avg_size = features.get("avg_packet_size", 0)
+        std_size = features.get("std_packet_size", 0)
+        samples  = features.get("total_samples", 0)
+        size = current_size if current_size is not None else avg_size
 
-    if z_score > 5 and avg_size > 1000 and samples > 30:
-        return "DDoS Attack"
-    elif escalation and z_score > 3:
-        return "Brute Force / Escalating Attack"
-    elif std_size < 15 and samples > 20 and z_score > 2:
-        return "Beaconing / C2 Communication"
-    elif avg_size > 800 and z_score > 3 and not escalation:
-        return "Data Exfiltration Pattern"
-    elif z_score > 4 and avg_size < 100:
-        return "Port Scan"
-    elif z_score > 3:
-        return "Brute Force / Escalating Attack"
-    elif z_score > 2:
-        return "Beaconing / C2 Communication"
-    else:
-        return "Unknown Suspicious Activity"
+        if z_score > 4 and size < 100:
+            return "Port Scan"
+        elif z_score > 3 and size > 3000 and samples > 30:
+            return "DDoS Attack"
+        elif size > 800 and size <= 3000 and z_score > 3:
+            return "Data Exfiltration Pattern"
+        elif std_size < 15 and samples > 20 and z_score > 2 and size < 800:
+            return "Beaconing / C2 Communication"
+        elif escalation and z_score > 3:
+            return "Brute Force / Escalating Attack"
+        elif z_score > 3:
+            return "Brute Force / Escalating Attack"
+        elif z_score > 2:
+            return "Beaconing / C2 Communication"
+        else:
+            return "Unknown Suspicious Activity"
 
     @property
     def ml_available(self) -> bool:

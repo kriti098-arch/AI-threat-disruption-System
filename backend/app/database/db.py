@@ -1,9 +1,15 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = "mysql+mysqlconnector://root@localhost/ai_threat_disruption"
+# Uses SQLite by default so this runs anywhere (Render, Railway, your laptop)
+# with zero setup. If you ever want to point at a real MySQL/Postgres server
+# (e.g. on Render), set a DATABASE_URL environment variable and it'll be used
+# instead automatically.
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./atds.db")
 
-engine = create_engine(DATABASE_URL)
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
 SessionLocal = sessionmaker(
     autocommit=False,

@@ -7,6 +7,7 @@ ATTACK_TO_STAGE = {
     "Beaconing / C2 Communication":     "command_and_control",
     "Brute Force / Escalating Attack":  "credential_access",
     "DDoS Pattern":                     "impact",
+    "DDoS Attack":                      "impact",   # <-- ADD THIS LINE (matches actual classifier output)
     "Data Exfiltration Pattern":        "exfiltration",
     "Unknown Suspicious Activity":      "discovery",
     "Port Scan":                        "reconnaissance",

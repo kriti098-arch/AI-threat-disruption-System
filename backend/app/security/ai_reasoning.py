@@ -1,22 +1,13 @@
-# app/security/ai_reasoning.py
-# UPGRADED — Phase 3: Session-Aware LLM Reasoning
-#
-# WHAT CHANGED:
-# Added get_session_aware_analysis() which wraps your existing
-# get_ai_threat_analysis() but enriches the prompt with the full
-# attack session context before calling Claude.
-#
-# Your original get_ai_threat_analysis() is kept below untouched
-# so nothing else in your codebase breaks.
 
-import anthropic
+from groq import Groq
 from sqlalchemy.orm import Session
 from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=Path(__file__).parent.parent.parent / ".env")
 
-client = anthropic.Anthropic()
+client = Groq()
+MODEL_NAME = "llama-3.3-70b-versatile"
 
 
 # ─────────────────────────────────────────────────────────────
@@ -177,12 +168,12 @@ Keep response under 200 words. Reference actual data from the session above.
 """
 
     try:
-        response = client.messages.create(
-            model="claude-opus-4-5",
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
             max_tokens=500,
             messages=[{"role": "user", "content": prompt}],
         )
-        narrative = response.content[0].text
+        narrative = response.choices[0].message.content
 
         # Detect threat level from response
         detected_level = threat_label
@@ -197,7 +188,7 @@ Keep response under 200 words. Reference actual data from the session above.
             "session_event_count":      session["event_count"],
             "session_past_incidents":   session["past_incidents"],
             "reasoning_type":           "session_aware",
-            "model":                    "claude-opus-4-5",
+            "model":                    MODEL_NAME,
         }
 
     except Exception as e:
@@ -240,15 +231,15 @@ Provide: 1) Threat assessment 2) Attack explanation 3) Recommended actions.
 Keep under 150 words."""
 
     try:
-        response = client.messages.create(
-            model="claude-opus-4-5",
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
             max_tokens=400,
             messages=[{"role": "user", "content": prompt}],
         )
         return {
-            "narrative":      response.content[0].text,
+            "narrative":      response.choices[0].message.content,
             "reasoning_type": "single_event",
-            "model":          "claude-opus-4-5",
+            "model":          MODEL_NAME,
         }
     except Exception as e:
         return {
