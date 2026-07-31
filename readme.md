@@ -133,4 +133,4 @@ This project uses the **CIC-IDS2017** dataset for training and evaluating anomal
 
 ## Author
 
-Developed by [kriti098-arch](https://github.com/kriti098-arch)s
+Developed by [kriti098-arch](https://github.com/kriti098-arch)
