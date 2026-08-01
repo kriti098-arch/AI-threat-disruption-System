@@ -36,8 +36,8 @@ import time
 import random
 import requests
 
-SERVER_URL = "http://127.0.0.1:8000/network-events/"
-REQUEST_DELAY_SECONDS = 0.03
+SERVER_URL = "https://ai-threat-disruption-system.onrender.com/network-events/"
+REQUEST_DELAY_SECONDS = 0.15 
 
 
 def send(src_ip, packet_size, dst_port=80, protocol="TCP"):

@@ -569,3 +569,34 @@ def shap_global_importance(db: Session = Depends(get_db)):
 
     importance = shap_explainer.explain_batch(event_dicts)
     return {"importance": importance, "sample_size": len(events)}
+# ─────────────────────────────────────────────────────────────
+# TEMPORARY: one-off admin endpoint to spread incident timestamps
+# across a realistic 24h window. Remove after running once.
+# ─────────────────────────────────────────────────────────────
+@router.post("/admin/spread-timestamps")
+def spread_timestamps(secret: str, db: Session = Depends(get_db)):
+    if secret != "kriti-demo-2026":  # simple guard so randoms can't hit this
+        return {"error": "unauthorized"}
+
+    import random
+    from datetime import datetime, timedelta, timezone
+
+    incidents = db.query(Incident).order_by(Incident.timestamp.asc()).all()
+    if not incidents:
+        return {"message": "no incidents found"}
+
+    total = len(incidents)
+    now = datetime.now(timezone.utc)
+    window_start = now - timedelta(hours=24)
+    slot_size = (24 * 3600) / total
+
+    for i, incident in enumerate(incidents):
+        offset = i * slot_size + random.uniform(0, slot_size * 0.8)
+        incident.timestamp = window_start + timedelta(seconds=offset)
+
+    db.commit()
+    return {
+        "spread": total,
+        "earliest": str(incidents[0].timestamp),
+        "latest": str(incidents[-1].timestamp),
+    }
