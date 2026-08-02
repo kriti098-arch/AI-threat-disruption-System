@@ -182,6 +182,15 @@ def profile_exfiltration_light(src_ip):
         time.sleep(REQUEST_DELAY_SECONDS)
     if last:
         print(f"    final -> stage={last.get('kill_chain_stage')}", flush=True)
+def profile_honeypot_hits(src_ip):
+    """Directly hit honeypot decoy ports — instant CRITICAL, no baseline needed."""
+    print(f"[{src_ip}] Honeypot trigger profile", flush=True)
+    honeypot_ports = [2222, 3389, 1433, 3306, 5432, 6379, 27017, 9200, 4444, 31337]
+    for port in honeypot_ports:
+        r = send(src_ip, packet_size=100, dst_port=port)
+        if r:
+            print(f"    port {port} -> honeypot_confirmed={r.get('honeypot_confirmed')}", flush=True)
+        time.sleep(REQUEST_DELAY_SECONDS)
 
 def main():
     profiles = [
@@ -206,6 +215,8 @@ def main():
         # Data Exfiltration
         ("192.168.10.15", profile_exfiltration),
         ("192.168.10.35", profile_exfiltration_light),
+        ("192.168.10.41", profile_honeypot_hits),
+        ("192.168.10.42", profile_honeypot_hits),
     ]
 
     for src_ip, fn in profiles:
