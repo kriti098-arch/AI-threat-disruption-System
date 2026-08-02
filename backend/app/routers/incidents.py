@@ -37,7 +37,7 @@ def get_incidents(db: Session = Depends(get_db)):
             "risk_level": i.risk_level,
             "mitigation_status": i.mitigation_status,
             "proof": i.proof,
-            "timestamp": i.timestamp.isoformat() + "Z"
+            "timestamp": i.timestamp.isoformat() 
         }
         for i in incidents
     ]
@@ -62,7 +62,7 @@ def get_incident_details(incident_id: int, db: Session = Depends(get_db)):
         "severity": incident.severity,
         "risk_score": incident.risk_score,
         "risk_level": incident.risk_level,
-        "timestamp": incident.timestamp.isoformat() + "Z",
+        "timestamp": incident.timestamp.isoformat() ,
 
         # 🔥 BEFORE / AFTER mitigation data
         "mitigation_status": incident.mitigation_status,
