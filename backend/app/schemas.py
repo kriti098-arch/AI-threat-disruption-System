@@ -23,6 +23,7 @@ class NetworkEventCreate(BaseModel):
     dst_ip: str
     protocol: str
     packet_size: int
+    dst_port: int = 0
 
 class NetworkEventResponse(NetworkEventCreate):
     event_id: int
@@ -57,3 +58,4 @@ class ResponseActionResponse(ResponseActionCreate):
 
     class Config:
         from_attributes = True
+
