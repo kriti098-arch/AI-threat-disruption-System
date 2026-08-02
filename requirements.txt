@@ -11,3 +11,4 @@ shap
 joblib
 reportlab
 httpx
+psycopg2-binary
