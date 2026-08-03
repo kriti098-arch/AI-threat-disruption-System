@@ -1,0 +1,101 @@
+{
+  "isolation_forest": {
+    "model": "Isolation Forest",
+    "precision": 0.219,
+    "recall": 0.0496,
+    "f1": 0.0809,
+    "accuracy": 0.4487,
+    "roc_auc": 0.4402,
+    "fpr": 0.1693,
+    "fnr": 0.9504,
+    "tp": 97,
+    "tn": 1698,
+    "fp": 346,
+    "fn": 1859,
+    "total_samples": 4000,
+    "classification_report": {
+      "Benign": {
+        "precision": 0.4773685690188361,
+        "recall": 0.8307240704500979,
+        "f1-score": 0.6063202999464381,
+        "support": 2044.0
+      },
+      "Attack": {
+        "precision": 0.21896162528216703,
+        "recall": 0.04959100204498978,
+        "f1-score": 0.08086702792830346,
+        "support": 1956.0
+      },
+      "accuracy": 0.44875,
+      "macro avg": {
+        "precision": 0.3481650971505016,
+        "recall": 0.44015753624754383,
+        "f1-score": 0.3435936639373708,
+        "support": 4000.0
+      },
+      "weighted avg": {
+        "precision": 0.35100757353160494,
+        "recall": 0.44875,
+        "f1-score": 0.34937364992957026,
+        "support": 4000.0
+      }
+    }
+  },
+  "random_forest": {
+    "model": "Random Forest",
+    "precision": 1.0,
+    "recall": 0.9985,
+    "f1": 0.9992,
+    "accuracy": 0.9992,
+    "roc_auc": 1.0,
+    "fpr": 0.0,
+    "fnr": 0.0015,
+    "tp": 1953,
+    "tn": 2044,
+    "fp": 0,
+    "fn": 3,
+    "total_samples": 4000,
+    "classification_report": {
+      "Benign": {
+        "precision": 0.9985344406448461,
+        "recall": 1.0,
+        "f1-score": 0.9992666829626008,
+        "support": 2044.0
+      },
+      "Attack": {
+        "precision": 1.0,
+        "recall": 0.9984662576687117,
+        "f1-score": 0.9992325402916347,
+        "support": 1956.0
+      },
+      "accuracy": 0.99925,
+      "macro avg": {
+        "precision": 0.9992672203224231,
+        "recall": 0.9992331288343559,
+        "f1-score": 0.9992496116271177,
+        "support": 4000.0
+      },
+      "weighted avg": {
+        "precision": 0.9992510991695164,
+        "recall": 0.99925,
+        "f1-score": 0.9992499871964983,
+        "support": 4000.0
+      }
+    }
+  },
+  "isolation_forest_cv": {
+    "precision": 0.2021,
+    "precision_std": 0.0157,
+    "recall": 0.0408,
+    "recall_std": 0.005,
+    "f1": 0.0678,
+    "f1_std": 0.0077,
+    "accuracy": 0.4401,
+    "accuracy_std": 0.0041,
+    "fpr": 0.1606,
+    "fpr_std": 0.0107,
+    "fnr": 0.9592,
+    "fnr_std": 0.005,
+    "n_folds": 5
+  }
+}
